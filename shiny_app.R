@@ -6,7 +6,8 @@ cur_x <- 1
 cur_y <- 1
 
 turbine_array <- data.frame(x = numeric(0), y=numeric(0))
-current_wind_map <- make_initial_wind_map(1)
+init_wind_map <- make_initial_wind_map(1)
+cur_wind_map <- init_wind_map
 
 
 ui <- fluidPage(
@@ -52,7 +53,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   output$plot1 <- renderPlot({
-     plot_wind_map(current_wind_map)
+     plot_wind_map(cur_wind_map)
   })
   
   observeEvent(input$plot_click, {
@@ -60,7 +61,13 @@ server <- function(input, output) {
     cur_y <<- round(input$plot_hover$y * domain_dims[2])
     turbine_array <<- rbind(turbine_array, 
                             data.frame(x = cur_x, y=cur_y))
-    output$table <- renderDataTable(DT::datatable(turbine_array, options = list(searching = FALSE)))
+    output$table <- renderDataTable(DT::datatable(turbine_array, 
+                                                  options = list(searching = FALSE, paging = FALSE)))
+    tw = turbine_conditional_wind_map(c(cur_y, cur_x), init_wind_map)
+    cur_wind_map <<- pmin(tw, cur_wind_map)
+    output$plot1 <- renderPlot({
+      plot_wind_map(cur_wind_map)
+    })
   })
   
   output$hover_info <- renderPrint({
