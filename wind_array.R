@@ -11,13 +11,16 @@ turbine_locs = data.frame(x = numeric(0), y=numeric(0))
 
 
 
-make_initial_wind_map = function(seed = 2){
+make_initial_wind_map = function(seed = 1){
   set.seed(seed)
-  W = matrix(runif(prod(domain_dims)), nrow=domain_dims[1])
-  W = my_smooth(W, sigma=5)
-  #
-  W = W/max(W)
-  W = W * 10
+  n <- round(prod(domain_dims) /5)
+  W = matrix(0, nrow=domain_dims[1], ncol=domain_dims[2])
+  xinds = sample(1:domain_dims[1], n, replace = T)
+  yinds = sample(1:domain_dims[2], n, replace = T)
+  W[cbind(xinds, yinds)] <- 20 * rnorm(n, mean = 7, sd = 2)
+  W = my_smooth(W, sigma=10)
+  W = W/max(W) * 10
+  
   W
 }
 
