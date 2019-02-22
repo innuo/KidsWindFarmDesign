@@ -25,15 +25,15 @@ turbine_conditional_wind_map = function(turbine_xy, init_wind_map){
   x = turbine_xy[1]
   y = turbine_xy[2]
   W = matrix(0, nrow=domain_dims[1], ncol=domain_dims[2])
-  W[x, y] <- 1
-  W =  1 - my_smooth(W, sigma=3.5)
+  W[x, y] <- 100
+  W =  1 - my_smooth(W, sigma=6.0)
   W[x, y] <- 1
   turbine_wind_map = W * init_wind_map
 
   W = matrix(0, nrow=domain_dims[1], ncol=domain_dims[2])
-  vecs = sweep(all_inds, MARGIN = 2, STATS = turbine_xy)
-  inds = abs(vecs[,2])/(vecs[,1]) < 0.1 & vecs[,1] > 0
-  vals = 0.3 * 1/sqrt(vecs[inds, 1])
+  vecs = sweep(all_inds, MARGIN = 2, STATS = c(turbine_xy[1]-5, turbine_xy[2]))
+  inds = abs(vecs[,2])/(vecs[,1]) < 0.15 & vecs[,1] > 0
+  vals = 0.5 * 1/(vecs[inds, 1])^0.5
   W[all_inds[inds,]] <- vals
   # 
   turbine_wind_map = turbine_wind_map * (1-W)

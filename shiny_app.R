@@ -73,9 +73,12 @@ server <- function(input, output) {
   output$hover_info <- renderPrint({
     cur_x <-  round(input$plot_hover$x * domain_dims[1])
     cur_y <- round(input$plot_hover$y * domain_dims[2])
+    
+    cur_x <- max(min(cur_x, domain_dims[1]), 0)
+    cur_y <- max(min(cur_y, domain_dims[2]), 0)
     cat("Location and wind speed\n")
     cat(paste0("x = ", cur_x, "\ny = ", cur_y,
-               "\nWind speed = ", round(W[cur_y, cur_x], 1)))
+               "\nWind speed = ", round(cur_wind_map[cur_y, cur_x], 1)))
   })
   
   output$dblclick_info <- renderPrint({
