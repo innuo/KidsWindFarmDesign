@@ -31,13 +31,12 @@ turbine_conditional_wind_map = function(turbine_xy, init_wind_map){
   turbine_wind_map = W * init_wind_map
 
   W = matrix(0, nrow=domain_dims[1], ncol=domain_dims[2])
-  vecs = sweep(all_inds, MARGIN = 2, STATS = c(turbine_xy[1]-5, turbine_xy[2]))
+  vecs = sweep(all_inds, MARGIN = 2, STATS = c(turbine_xy[1], turbine_xy[2]))
   inds = abs(vecs[,2])/(vecs[,1]) < 0.15 & vecs[,1] > 0
   vals = 0.5 * 1/(vecs[inds, 1])^0.5
   W[all_inds[inds,]] <- vals
   # 
   turbine_wind_map = turbine_wind_map * (1-W)
-
   turbine_wind_map
 }
 
