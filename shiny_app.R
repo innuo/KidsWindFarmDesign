@@ -2,7 +2,7 @@ library(shiny)
 library(DT)
 source("wind_array.R")
 
-init_wind_map <- make_initial_wind_map(5)
+seed <- 0
 
 ui <- fluidPage(
   # Some custom CSS for a smaller font for preformatted text
@@ -46,6 +46,9 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+  seed <<- seed %% 5 + 1
+  init_wind_map <- make_initial_wind_map(seed)
+  
   cur_x <<- 1
   cur_y <<- 1
 
@@ -53,7 +56,7 @@ server <- function(input, output) {
   cur_wind_map <<- init_wind_map
 
   output$plot1 <- renderPlot({
-     plot_wind_map(cur_wind_map)
+     plot_wind_map(cur_wind_map, main=sprintf("Wind Map %d", seed))
   })
 
   observeEvent(input$plot_click, {
@@ -73,7 +76,7 @@ server <- function(input, output) {
                                                   options = list(searching = FALSE, paging = FALSE)))
 
     output$plot1 <- renderPlot({
-      plot_wind_map(cur_wind_map)
+      plot_wind_map(cur_wind_map, main=sprintf("Wind Map %d", seed))
     })
   })
 

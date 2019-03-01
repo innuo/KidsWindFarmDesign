@@ -43,7 +43,7 @@ turbine_conditional_wind_map = function(turbine_xy, init_wind_map){
   turbine_wind_map
 }
 
-plot_wind_map = function(X){
+plot_wind_map = function(X, main){
   breaks = seq(7, 10, 0.2)
   newcol <- colorRampPalette(brewer.pal(9,"YlGnBu"))
   ncols <- length(breaks)-1
@@ -52,7 +52,7 @@ plot_wind_map = function(X){
  p = image.plot(t(as.matrix(X)), col=cols, 
             breaks = breaks, 
             asp=1, axes = F, legend.shrink = 0.3, horizontal = TRUE, 
-            xlim=c(0, 1), ylim=c(0, 1))
+            xlim=c(0, 1), ylim=c(0, 1), main=main)
  p
 }
 
