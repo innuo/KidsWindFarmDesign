@@ -46,6 +46,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+  game_over <- FALSE
   seed <<- seed %% 5 + 1
   init_wind_map <- make_initial_wind_map(seed)
   
@@ -66,18 +67,24 @@ server <- function(input, output) {
     cur_x <<- max(min(cur_x, domain_dims[1]), 1)
     cur_y <<- max(min(cur_y, domain_dims[2]), 1)
 
-
-    turbine_array <<- rbind(turbine_array,
-                            data.frame(x = cur_x, y=cur_y, ws=round(cur_wind_map[cur_y, cur_x], 1)))
-    tw = turbine_conditional_wind_map(c(cur_y, cur_x), init_wind_map)
-    cur_wind_map <<- pmin(tw, cur_wind_map)
-    turbine_array$wind.speed <- round(cur_wind_map[cbind(turbine_array$y, turbine_array$x)], 1)
-    output$table <- renderDataTable(DT::datatable(turbine_array,
-                                                  options = list(searching = FALSE, paging = FALSE)))
-
+    if(!game_over){
+      turbine_array <<- rbind(turbine_array,
+                              data.frame(x = cur_x, y=cur_y, ws=round(cur_wind_map[cur_y, cur_x], 1)))
+      tw = turbine_conditional_wind_map(c(cur_y, cur_x), init_wind_map)
+      cur_wind_map <<- pmin(tw, cur_wind_map)
+      turbine_array$wind.speed <- round(cur_wind_map[cbind(turbine_array$y, turbine_array$x)], 1)
+      output$table <- renderDataTable(DT::datatable(turbine_array,
+                                                    options = list(searching = FALSE, paging = FALSE)))
+    }
     output$plot1 <- renderPlot({
       plot_wind_map(cur_wind_map, main=sprintf("Wind Map %d", seed))
     })
+    
+    if(nrow(turbine_array) == 5){
+      game_over <<- TRUE
+      beep(1)
+    }
+    
   })
 
   output$hover_info <- renderPrint({
