@@ -81,8 +81,8 @@ server <- function(input, output) {
     })
     
     if(nrow(turbine_array) == 5){
+      if(!game_over) beep(1)
       game_over <<- TRUE
-      beep(1)
     }
     
   })
