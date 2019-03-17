@@ -1,8 +1,11 @@
 library(shiny)
 library(DT)
+library(beepr)
 source("wind_array.R")
 
 seed <- 0
+num_maps <- 5
+max_turbines <- 15
 
 ui <- fluidPage(
   # Some custom CSS for a smaller font for preformatted text
@@ -11,7 +14,10 @@ ui <- fluidPage(
                     pre, table.table {
                     font-size: smaller;
                     }
-                    "))
+                    ")),
+    tags$style(type = 'text/css', '#score         
+               {font-size: 18px; font-family: Helvetica; background-color: rgba(255,255,255,0.40); 
+               color: blue; border-style: none;}')
     ),
 
   fluidRow(
@@ -40,14 +46,14 @@ ui <- fluidPage(
            verbatimTextOutput("hover_info")
     ),
     column(width = 3,
-           verbatimTextOutput("click_info")
+           span(verbatimTextOutput("score"), style="color:blue")
     )
   )
 )
 
 server <- function(input, output) {
   game_over <- FALSE
-  seed <<- seed %% 5 + 1
+  seed <<- seed %% num_maps + 1
   init_wind_map <- make_initial_wind_map(seed)
   
   cur_x <<- 1
@@ -57,7 +63,7 @@ server <- function(input, output) {
   cur_wind_map <<- init_wind_map
 
   output$plot1 <- renderPlot({
-     plot_wind_map(cur_wind_map, main=sprintf("Wind Map %d", seed))
+     plot_wind_map(cur_wind_map, main=sprintf("Arrange %d Turbines for Wind Map %d. ", max_turbines, seed))
   })
 
   observeEvent(input$plot_click, {
@@ -77,10 +83,19 @@ server <- function(input, output) {
                                                     options = list(searching = FALSE, paging = FALSE)))
     }
     output$plot1 <- renderPlot({
-      plot_wind_map(cur_wind_map, main=sprintf("Wind Map %d", seed))
+      plot_wind_map(cur_wind_map, main=sprintf("Arrange %d Turbines for Wind Map %d. ", max_turbines, seed))
     })
     
-    if(nrow(turbine_array) == 5){
+    output$score <- renderText({
+      score <- sum(turbine_array$wind.speed)
+      if(!game_over)
+        sprintf("\nCurrent Score: %5.1f", score)
+      else
+        sprintf("GAME OVER    \nFinal   Score: %5.1f", score)
+              
+    })
+    
+    if(nrow(turbine_array) == max_turbines){
       if(!game_over) beep(1)
       game_over <<- TRUE
     }
