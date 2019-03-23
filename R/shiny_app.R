@@ -1,22 +1,28 @@
-library(shiny)
-library(DT)
-library(beepr)
-source("wind_array.R")
+
 
 seed <- 0
 num_maps <- 5
 max_turbines <- 15
 
+
+start_game <- function(n_turbines = 15, n_maps = 5){
+  max_turbines <<- n_turbines
+  num_maps <<- n_maps
+
+  print(num_turbines)
+  shinyApp(ui, server)
+
+}
+
 ui <- fluidPage(
-  # Some custom CSS for a smaller font for preformatted text
   tags$head(
     tags$style(HTML("
                     pre, table.table {
                     font-size: smaller;
                     }
                     ")),
-    tags$style(type = 'text/css', '#score         
-               {font-size: 18px; font-family: Helvetica; background-color: rgba(255,255,255,0.40); 
+    tags$style(type = 'text/css', '#score
+               {font-size: 18px; font-family: Helvetica; background-color: rgba(255,255,255,0.40);
                color: blue; border-style: none;}')
     ),
 
@@ -52,14 +58,15 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
+
   game_over <- FALSE
   seed <<- seed %% num_maps + 1
   init_wind_map <- make_initial_wind_map(seed)
-  
+
   cur_x <<- 1
   cur_y <<- 1
 
-  turbine_array <<- data.frame(x = numeric(0), y=numeric(0), wind.speed=numeric(0))
+  turbine_array <<- data.frame(x = numeric(0), y=numeric(0), orig.ws = numeric(0), waked.ws=numeric(0))
   cur_wind_map <<- init_wind_map
 
   output$plot1 <- renderPlot({
@@ -74,32 +81,41 @@ server <- function(input, output) {
     cur_y <<- max(min(cur_y, domain_dims[2]), 1)
 
     if(!game_over){
-      turbine_array <<- rbind(turbine_array,
-                              data.frame(x = cur_x, y=cur_y, ws=round(cur_wind_map[cur_y, cur_x], 1)))
+      ws <- round(init_wind_map[cur_y, cur_x], 1)
       tw = turbine_conditional_wind_map(c(cur_y, cur_x), init_wind_map)
       cur_wind_map <<- pmin(tw, cur_wind_map)
-      turbine_array$wind.speed <- round(cur_wind_map[cbind(turbine_array$y, turbine_array$x)], 1)
+      waked.ws <- round(cur_wind_map[cbind(c(turbine_array$y, cur_y),
+                                           c(turbine_array$x, cur_x))], 1)
+      print(waked.ws)
+      turbine_array <<- data.frame(x = c(turbine_array$x, cur_x),
+                                   y = c(turbine_array$y, cur_y),
+                                   orig.ws = c(turbine_array$orig.ws, ws),
+                                   waked.ws = waked.ws)
+
       output$table <- renderDataTable(DT::datatable(turbine_array,
                                                     options = list(searching = FALSE, paging = FALSE)))
     }
+    print (turbine_array)
+
     output$plot1 <- renderPlot({
       plot_wind_map(cur_wind_map, main=sprintf("Arrange %d Turbines for Wind Map %d. ", max_turbines, seed))
     })
-    
+
+    if(nrow(turbine_array) == max_turbines){
+      if(!game_over) beepr::beep(1)
+      game_over <<- TRUE
+    }
+
     output$score <- renderText({
-      score <- sum(turbine_array$wind.speed)
+    score <- sum(turbine_array$waked.ws)
       if(!game_over)
         sprintf("\nCurrent Score: %5.1f", score)
       else
         sprintf("GAME OVER    \nFinal   Score: %5.1f", score)
-              
+
     })
-    
-    if(nrow(turbine_array) == max_turbines){
-      if(!game_over) beep(1)
-      game_over <<- TRUE
-    }
-    
+
+
   })
 
   output$hover_info <- renderPrint({
@@ -122,4 +138,3 @@ server <- function(input, output) {
 }
 
 
-shinyApp(ui, server)

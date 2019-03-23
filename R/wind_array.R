@@ -1,7 +1,3 @@
-library(RColorBrewer)
-library(spatstat)
-library(fields)
-
 
 domain_dims = c(200, 200)
 all_inds = as.matrix(expand.grid(1:domain_dims[1], 1:domain_dims[2]))
@@ -20,7 +16,7 @@ make_initial_wind_map = function(seed = 1){
   W[cbind(xinds, yinds)] <- 20 * rnorm(n, mean = 7, sd = 2)
   W = my_smooth(W, sigma=10)
   W = W/max(W) * 10
-  
+
   W
 }
 
@@ -38,27 +34,27 @@ turbine_conditional_wind_map = function(turbine_xy, init_wind_map){
   inds = abs(vecs[,2])/(vecs[,1]) < 0.15 & vecs[,1] > 0
   vals = 0.5 * 1/(vecs[inds, 1])^0.5
   W[all_inds[inds,]] <- vals
-  # 
+  #
   turbine_wind_map = turbine_wind_map * (1-W)
   turbine_wind_map
 }
 
 plot_wind_map = function(X, main){
   breaks = seq(7, 10, 0.2)
-  newcol <- colorRampPalette(brewer.pal(9,"YlGnBu"))
+  newcol <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(9,"YlGnBu"))
   ncols <- length(breaks)-1
   cols <- newcol(ncols)
-  
- p = image.plot(t(as.matrix(X)), col=cols, 
-            breaks = breaks, 
-            asp=1, axes = F, legend.shrink = 0.3, horizontal = TRUE, 
+
+ p = fields::image.plot(t(as.matrix(X)), col=cols,
+            breaks = breaks,
+            asp=1, axes = F, legend.shrink = 0.3, horizontal = TRUE,
             xlim=c(0, 1), ylim=c(0, 1), main=main)
  p
 }
 
 my_smooth = function(M, sigma){
-  I = im(M)
-  Is = blur(I, sigma = sigma, bleed = FALSE, normalise = TRUE)
+  I = spatstat::im(M)
+  Is = spatstat::blur(I, sigma = sigma, bleed = FALSE, normalise = TRUE)
   return(Is$v)
 }
 
