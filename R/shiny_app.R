@@ -38,12 +38,13 @@ ui <- fluidPage(
                       ),
                       hover = hoverOpts(
                         id = "plot_hover",
-                        delay=50
+                        delay=10
                       )
            )
     ),
     column(width = 4, offset = 4,
            DT::dataTableOutput('table')
+           #DT::DTOutput('table')
     )
   ),
 
@@ -86,13 +87,12 @@ server <- function(input, output) {
       cur_wind_map <<- pmin(tw, cur_wind_map)
       waked.ws <- round(cur_wind_map[cbind(c(turbine_array$y, cur_y),
                                            c(turbine_array$x, cur_x))], 1)
-      print(waked.ws)
       turbine_array <<- data.frame(x = c(turbine_array$x, cur_x),
                                    y = c(turbine_array$y, cur_y),
                                    orig.ws = c(turbine_array$orig.ws, ws),
                                    waked.ws = waked.ws)
 
-      output$table <- renderDataTable(DT::datatable(turbine_array,
+      output$table <- DT::renderDataTable(DT::datatable(turbine_array,
                                                     options = list(searching = FALSE, paging = FALSE)))
     }
     print (turbine_array)
