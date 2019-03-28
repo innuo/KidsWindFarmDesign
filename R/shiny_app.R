@@ -17,7 +17,7 @@ start_game <- function(n_turbines = 15, n_maps = 5){
 #' @import shiny
 ui <- shiny::fluidPage(
   shiny::tags$head(
-    shiny::tags$style(HTML("
+    shiny::tags$style(shiny::HTML("
                     pre, table.table {
                     font-size: smaller;
                     }
