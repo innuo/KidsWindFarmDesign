@@ -5,8 +5,6 @@ start_game <- function(n_turbines = 15, n_maps = 5){
   seed <<- 0
   max_turbines <<- n_turbines
   num_maps <<- n_maps
-
-  print(num_turbines)
   shinyApp(ui, server)
 
 }
