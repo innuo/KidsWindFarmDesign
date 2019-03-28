@@ -5,7 +5,7 @@ start_game <- function(n_turbines = 15, n_maps = 5){
   seed <<- 0
   max_turbines <<- n_turbines
   num_maps <<- n_maps
-  shinyApp(ui, server)
+  shiny::shinyApp(ui, server)
 
 }
 
@@ -67,11 +67,11 @@ server <- function(input, output) {
   turbine_array <<- data.frame(x = numeric(0), y=numeric(0), orig.ws = numeric(0), waked.ws=numeric(0))
   cur_wind_map <<- init_wind_map
 
-  output$plot1 <- renderPlot({
+  output$plot1 <- shiny::renderPlot({
      plot_wind_map(cur_wind_map, main=sprintf("Arrange %d Turbines for Wind Map %d. ", max_turbines, seed))
   })
 
-  observeEvent(input$plot_click, {
+  shiny::observeEvent(input$plot_click, {
     cur_x <<-  round(input$plot_hover$x * domain_dims[1])
     cur_y <<- round(input$plot_hover$y * domain_dims[2])
 
@@ -94,7 +94,7 @@ server <- function(input, output) {
     }
     print (turbine_array)
 
-    output$plot1 <- renderPlot({
+    output$plot1 <- shiny::renderPlot({
       plot_wind_map(cur_wind_map, main=sprintf("Arrange %d Turbines for Wind Map %d. ", max_turbines, seed))
     })
 
@@ -103,7 +103,7 @@ server <- function(input, output) {
       game_over <<- TRUE
     }
 
-    output$score <- renderText({
+    output$score <- shiny::renderText({
     score <- sum(turbine_array$waked.ws)
       if(!game_over)
         sprintf("\nCurrent Score: %5.1f", score)
@@ -115,7 +115,7 @@ server <- function(input, output) {
 
   })
 
-  output$hover_info <- renderPrint({
+  output$hover_info <- shiny::renderPrint({
     cur_x <-  round(input$plot_hover$x * domain_dims[1])
     cur_y <- round(input$plot_hover$y * domain_dims[2])
 
@@ -126,7 +126,7 @@ server <- function(input, output) {
                "\nWind speed = ", round(cur_wind_map[cur_y, cur_x], 1)))
   })
 
-  output$dblclick_info <- renderPrint({
+  output$dblclick_info <- shiny::renderPrint({
     cat("input$plot_dblclick:\n")
     str(input$plot_dblclick)
   })
