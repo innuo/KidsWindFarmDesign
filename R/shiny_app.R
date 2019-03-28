@@ -72,8 +72,8 @@ server <- function(input, output) {
   })
 
   shiny::observeEvent(input$plot_click, {
-    cur_x <<-  round(input$plot_hover$x * domain_dims[1])
-    cur_y <<- round(input$plot_hover$y * domain_dims[2])
+    cur_x <<-  round(input$plot_click$x * domain_dims[1])
+    cur_y <<- round(input$plot_click$y * domain_dims[2])
 
     cur_x <<- max(min(cur_x, domain_dims[1]), 1)
     cur_y <<- max(min(cur_y, domain_dims[2]), 1)
