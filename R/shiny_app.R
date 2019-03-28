@@ -16,49 +16,50 @@ start_game <- function(n_turbines = 15, n_maps = 5){
 
 #' @import shiny
 ui <- shiny::fluidPage(
-  tags$head(
-    tags$style(HTML("
+  shiny::tags$head(
+    shiny::tags$style(HTML("
                     pre, table.table {
                     font-size: smaller;
                     }
                     ")),
-    tags$style(type = 'text/css', '#score
+    shiny::tags$style(type = 'text/css', '#score
                {font-size: 18px; font-family: Helvetica; background-color: rgba(255,255,255,0.40);
                color: blue; border-style: none;}')
     ),
 
-  fluidRow(
-    column(width = 3,
+  shiny::fluidRow(
+    shiny::column(width = 3,
            # In a plotOutput, passing values for click, dblclick, hover, or brush
            # will enable those interactions.
-           plotOutput("plot1", height = "600px", width = "250%",
+           shiny::plotOutput("plot1", height = "600px", width = "250%",
                       # Equivalent to: click = clickOpts(id = "plot_click")
-                      click = clickOpts(id = "plot_click"),
-                      dblclick = dblclickOpts(
+                      click = shiny::clickOpts(id = "plot_click"),
+                      dblclick = shiny::dblclickOpts(
                         id = "plot_dblclick"
                       ),
-                      hover = hoverOpts(
+                      hover = shiny::hoverOpts(
                         id = "plot_hover",
                         delay=10
                       )
            )
     ),
-    column(width = 4, offset = 4,
+    shiny::column(width = 4, offset = 4,
            DT::dataTableOutput('table')
            #DT::DTOutput('table')
     )
   ),
 
-  fluidRow(
-    column(width = 3,
-           verbatimTextOutput("hover_info")
+  shiny::fluidRow(
+    shiny::column(width = 3,
+           shiny::verbatimTextOutput("hover_info")
     ),
-    column(width = 3,
-           span(verbatimTextOutput("score"), style="color:blue")
+    shiny::column(width = 3,
+           span(shiny::verbatimTextOutput("score"), style="color:blue")
     )
   )
 )
 
+#' @import shiny
 server <- function(input, output) {
 
   game_over <- FALSE
