@@ -14,7 +14,8 @@ start_game <- function(n_turbines = 15, n_maps = 5){
 
 }
 
-ui <- fluidPage(
+#' @import shiny
+ui <- shiny::fluidPage(
   tags$head(
     tags$style(HTML("
                     pre, table.table {
