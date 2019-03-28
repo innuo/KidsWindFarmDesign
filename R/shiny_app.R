@@ -54,7 +54,7 @@ ui <- shiny::fluidPage(
            shiny::verbatimTextOutput("hover_info")
     ),
     shiny::column(width = 3,
-           span(shiny::verbatimTextOutput("score"), style="color:blue")
+           shiny::span(shiny::verbatimTextOutput("score"), style="color:blue")
     )
   )
 )
